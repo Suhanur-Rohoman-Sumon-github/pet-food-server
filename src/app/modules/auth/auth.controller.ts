@@ -6,6 +6,7 @@ import config from '../../config';
 import catchAsync from '../../utils/catachAsync';
 import sendResponse from '../../utils/sendResponse';
 import AppError from "../../error/Apperror";
+import { AuthServices } from './auth.service';
 
 
 const loginUser = catchAsync(async (req, res) => {
@@ -39,17 +40,17 @@ const getRefreshToken = catchAsync(async (req, res) => {
 });
 
 
-const changePassword = catchAsync(async (req, res) => {
-  const { ...passwordData } = req.body;
+// const changePassword = catchAsync(async (req, res) => {
+//   const { ...passwordData } = req.body;
 
-  const result = await AuthServices.changePassword(req.user, passwordData);
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: 'Password updated successfully!',
-    data: result,
-  });
-});
+//   const result = await AuthServices.changePassword(req.user, passwordData);
+//   sendResponse(res, {
+//     statusCode: 200,
+//     success: true,
+//     message: 'Password updated successfully!',
+//     data: result,
+//   });
+// });
 
 const forgetPassword = catchAsync(async (req, res) => {
   const userEmail = req.body.email;
@@ -84,7 +85,7 @@ const resetPassword = catchAsync(async (req, res) => {
 export const AuthControllers = {
   loginUser,
   getRefreshToken,
-  changePassword,
+//   changePassword,
   forgetPassword,
   resetPassword
 };

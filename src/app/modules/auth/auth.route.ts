@@ -3,6 +3,7 @@
 import express from 'express';
 import { AuthValidation } from './auth.validation';
 import validateRequest from '../../middleware/validateRequests';
+import { AuthControllers } from './auth.controller';
 
 const router = express.Router();
 
@@ -12,16 +13,16 @@ router.post(
   AuthControllers.loginUser,
 );
 
-router.post(
-  '/register',
-  validateRequest(userValidation.createUserValidationSchema),
-  userControllers.createUser,
-);
+// router.post(
+//   '/register',
+//   validateRequest(userValidation.createUserValidationSchema),
+//   userControllers.createUser,
+// );
 
-router.post(
-  '/change-password',
-  AuthControllers.changePassword
-);
+// router.post(
+//   '/change-password',
+//   AuthControllers.changePassword
+// );
 router.post(
   '/forget-password',
   AuthControllers.forgetPassword,

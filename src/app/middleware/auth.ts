@@ -1,58 +1,51 @@
-// import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import config from '../config';
+import catchAsync from '../utils/catachAsync';
+import AppError from '../error/Apperror';
+import { StatusCodes } from 'http-status-codes';
 
-// import jwt, { JwtPayload } from 'jsonwebtoken';
-// import config from '../config';
+// Define the possible roles
+type TUserRol = 'ADMIN' | 'VENDOR' | 'USER';
 
-// const Auth = (...requiredRoles: TUserRol[]) => {
-//   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-//     const authHeader = req.headers.authorization;
+const Auth = (...requiredRoles: TUserRol[]) => {
+  return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const authHeader = req.headers.authorization;
 
-   
+    // Check if the authorization header is present and properly formatted
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new AppError(
+        StatusCodes.UNAUTHORIZED,
+        'Authorization token is missing or invalid',
+      );
+    }
 
-//     if (!authHeader ) {
-//       throw new AppError(
-//         httpStatus.UNAUTHORIZED,
-//         'Unauthorized access detected',
-//       );
-//     }
+    const token = authHeader.split(' ')[1];
 
-//     const token = authHeader
-   
-//     if (!token) {
-//       throw new AppError(
-//         httpStatus.UNAUTHORIZED,
-//         'UnAuthorized access detection ',
-//       );
-//     }
-//     let decoded;
-//     try {
-//       decoded = jwt.verify(
-//         token,
-//         config.access_secret_key as string,
-//       ) as JwtPayload;
-//     } catch (err) {
-//       throw new AppError(401, 'UnAuthorized access detection ');
-//     }
-//     if (!decoded) {
-//       throw new AppError(
-//         httpStatus.UNAUTHORIZED,
-//         'UnAuthorized access detection ',
-//       );
-//     }
+    // Verify the token
+    let decoded: JwtPayload;
+    try {
+      decoded = jwt.verify(
+        token,
+        config.access_secret_key as string,
+      ) as JwtPayload;
+    } catch (err) {
+      throw new AppError(StatusCodes.UNAUTHORIZED, 'Invalid or expired token');
+    }
 
-//     if (!requiredRoles.includes(decoded.role as TUserRol)) {
-//       return res.status(401).json({
-//         success: false,
-//         statusCode: 401,
-//         message: 'You have no access to this route',
-//       });
-//     }
+    // Ensure the token has a valid role
+    if (!decoded || !decoded.role || !requiredRoles.includes(decoded.role as TUserRol)) {
+      throw new AppError(
+        StatusCodes.FORBIDDEN,
+        'You do not have access to this route',
+      );
+    }
 
-   
+    // Attach the decoded payload to the request
+    req.user = decoded;
 
-//     req.user = decoded;
-//     next();
-//   });
-// };
+    next();
+  });
+};
 
-// export default Auth;
+export default Auth;

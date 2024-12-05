@@ -30,8 +30,8 @@ const loginUser = async (payload: User) => {
     username: isUserExists.username,
   };
 
-  const accessToken = createToken(jwtPayload, config.access_secret_key, config.JWT_ACCESS_EXPIRES_IN);
-  const refreshToken = createToken(jwtPayload, config.refresh_secret_key, config.JWT_REFRESH_EXPIRES_IN);
+  const accessToken = createToken(jwtPayload, config.access_secret_key as string, config.JWT_ACCESS_EXPIRES_IN as string) ;
+  const refreshToken = createToken(jwtPayload, config.refresh_secret_key as string, config.JWT_REFRESH_EXPIRES_IN as string);
 
   return {
     accessToken,
@@ -47,7 +47,7 @@ const getRefreshToken = async (token: string) => {
 
   let decoded: JwtPayload;
   try {
-    decoded = jwt.verify(token, config.refresh_secret_key) as JwtPayload;
+    decoded = jwt.verify(token, config.refresh_secret_key as string) as JwtPayload;
   } catch (error) {
     throw new AppError(StatusCodes.UNAUTHORIZED, 'Invalid refresh token');
   }
@@ -59,8 +59,8 @@ const getRefreshToken = async (token: string) => {
 
   const accessToken = createToken(
     { userId: user.id, role: user.role },
-    config.access_secret_key,
-    config.JWT_ACCESS_EXPIRES_IN,
+    config.access_secret_key as string,
+    config.JWT_ACCESS_EXPIRES_IN as string,
   );
 
   return { accessToken };
@@ -94,7 +94,7 @@ const forgetPassword = async (email: string) => {
     throw new AppError(StatusCodes.NOT_FOUND, 'User not found');
   }
 
-  const resetToken = createToken({ email }, config.access_secret_key, '10m');
+  const resetToken = createToken( {userId:user.id,role:user.role,email:user.email}, config.access_secret_key as string, '10m');
   const resetUILink = `${config.reset_pass_ui_link}?email=${email}&token=${resetToken}`;
 
   sendEmail(user.email, resetUILink);
@@ -103,7 +103,7 @@ const forgetPassword = async (email: string) => {
 const resetPassword = async (payload: { email: string; newPassword: string }, token: string) => {
   let decoded: JwtPayload;
   try {
-    decoded = jwt.verify(token, config.access_secret_key) as JwtPayload;
+    decoded = jwt.verify(token, config.access_secret_key as string) as JwtPayload;
   } catch (error) {
     throw new AppError(StatusCodes.FORBIDDEN, 'Invalid or expired token');
   }
