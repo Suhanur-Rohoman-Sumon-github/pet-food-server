@@ -10,9 +10,11 @@ import AppError from '../../error/Apperror';
 const prisma = new PrismaClient();
 
 const loginUser = async (payload: User) => {
+  
   const isUserExists = await prisma.user.findUnique({
     where: { email: payload.email },
   });
+  console.log(isUserExists);
 
   if (!isUserExists) {
     throw new AppError(StatusCodes.NOT_FOUND, 'User not found');
@@ -30,7 +32,10 @@ const loginUser = async (payload: User) => {
     username: isUserExists.username,
   };
 
+  
+
   const accessToken = createToken(jwtPayload, config.access_secret_key as string, config.JWT_ACCESS_EXPIRES_IN as string) ;
+ 
   const refreshToken = createToken(jwtPayload, config.refresh_secret_key as string, config.JWT_REFRESH_EXPIRES_IN as string);
 
   return {
