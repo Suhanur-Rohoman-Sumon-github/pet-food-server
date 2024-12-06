@@ -7,5 +7,9 @@ router.post(
   '/',
   ProductsControllers.createProducts,
 );
+router.post(
+  '/category',
+  ProductsControllers.createProductsCategory,
+);
 
 export const productRoute = router

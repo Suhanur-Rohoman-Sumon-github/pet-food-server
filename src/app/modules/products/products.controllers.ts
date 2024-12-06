@@ -14,7 +14,19 @@ const createProducts = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const createProductsCategory = catchAsync(async (req, res) => {
+ 
+  const result = await productsService.createProductsInDB( req.body);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'category is created successfully',
+    data: result,
+  });
+});
 
 export const ProductsControllers = {
-    createProducts
+    createProducts,
+    createProductsCategory
 }

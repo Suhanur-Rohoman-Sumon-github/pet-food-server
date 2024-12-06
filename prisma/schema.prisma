@@ -21,16 +21,16 @@ enum Status {
 }
 
 model User {
-  id         String  @id @default(uuid())
-  email      String  @unique
+  id         String   @id @default(uuid())
+  email      String   @unique
   password   String
-  memberId   String  @unique
-  status     Status  @default(inProgress) // Added default value
-  isDeleted  Boolean @default(false)
-  role       Role    @default(USER) // Added default value
+  status     Status?
+  isDeleted  Boolean  @default(false)
+  role       Role
   created_at DateTime @default(now())
-  
+  updated_at DateTime @updatedAt
 }
+
 
 model Admin {
   id          String  @id @default(uuid())
@@ -50,7 +50,7 @@ model Vendor {
   email       String
   designation String
   contactNo   String
-  shop        Shop?   // Removed the @relation attribute here
+  shop        Shop?  
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 }
@@ -58,16 +58,16 @@ model Vendor {
 model Shop {
   id              String   @id @default(uuid())
   name            String
-  location        String?   @default("") // Added default value for location
-  cover_photo     String?   @default("") // Added default value for cover photo
-  profile_picture String?   @default("") // Added default value for profile picture
+  location        String?   @default("") 
+  cover_photo     String?   @default("") 
+  profile_picture String?   @default("") 
   products        Product[]
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
   vendorId        String   @unique
   vendor          Vendor   @relation(fields: [vendorId], references: [id])
-  ratings         Int      @default(0) // Added default value
-  follower        Int      @default(0) // Added default value
+  ratings         Int      @default(0) 
+  follower        Int      @default(0)
 }
 
 model Category {
@@ -80,17 +80,17 @@ model Category {
 
 model Product {
   id             String   @id @default(uuid())
-  shop_id        String   @default("") // Added default value
+  shop_id        String
   name           String
-  price          Float    @default(0.0) // Added default value
-  category_id    String   @default("") // Added default value
-  description    String?  @default("") // Added default value
-  stock_quantity Int      @default(0)  // Added default value
-  discount_price Float?   @default(0.0) // Added default value
-  images         String[] @default([]) // Added default value for array
+  price          Float    @default(0.0)
+  category_id    String
+  description    String?  @default("")
+  stock_quantity Int      @default(0)
+  discount_price Float?   @default(0.0)
+  images         String[] @default([])
   created_at     DateTime @default(now())
- 
 
   Shop           Shop     @relation(fields: [shop_id], references: [id])
   Category       Category @relation(fields: [category_id], references: [id])
 }
+

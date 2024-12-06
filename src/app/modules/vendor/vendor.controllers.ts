@@ -1,14 +1,11 @@
 import { StatusCodes } from "http-status-codes";
 import catchAsync from "../../utils/catachAsync";
 import sendResponse from "../../utils/sendResponse";
-import { UserServices } from "./user.services";
-const createUser = catchAsync(async (req, res) => {
- 
+import { VendorServices } from "./vendor.services";
 
-  const userData = req.body;
- 
+const createVendorInDB = catchAsync(async (req, res) => {
 
-  const result = await UserServices.creteUserInDB(userData);
+  const result = await VendorServices.createVendorInDB(req.body);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
@@ -18,6 +15,6 @@ const createUser = catchAsync(async (req, res) => {
   });
 });
 
-export const userControllers = {
-    createUser
+export const VendorControllers = {
+    createVendorInDB
 }
