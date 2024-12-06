@@ -68,29 +68,31 @@ model Shop {
   vendor          Vendor   @relation(fields: [vendorId], references: [id])
   ratings         Int      @default(0) 
   follower        Int      @default(0)
+
 }
 
 model Category {
-  id          String    @id @default(uuid())
-  name        String
-  products    Product[]
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  id         String   @id @default(uuid())
+  name       String
+  products   Product[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
+
 
 model Product {
   id             String   @id @default(uuid())
-  shop_id        String
+  shop_id        String?  
+  category_id    String?  
   name           String
   price          Float    @default(0.0)
-  category_id    String
   description    String?  @default("")
   stock_quantity Int      @default(0)
   discount_price Float?   @default(0.0)
   images         String[] @default([])
   created_at     DateTime @default(now())
-
-  Shop           Shop     @relation(fields: [shop_id], references: [id])
-  Category       Category @relation(fields: [category_id], references: [id])
+  Shop           Shop?    @relation(fields: [shop_id], references: [id])
+  Category       Category? @relation(fields: [category_id], references: [id])
 }
+
 

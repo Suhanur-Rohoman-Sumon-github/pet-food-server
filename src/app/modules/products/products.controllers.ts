@@ -16,7 +16,7 @@ const createProducts = catchAsync(async (req, res) => {
 });
 const createProductsCategory = catchAsync(async (req, res) => {
  
-  const result = await productsService.createProductsInDB( req.body);
+  const result = await productsService.createCategoryInDB( req.body);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
