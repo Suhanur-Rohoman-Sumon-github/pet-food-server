@@ -10,6 +10,7 @@ import AppError from '../../error/Apperror';
 const prisma = new PrismaClient();
 
 const loginUser = async (payload: User) => {
+  console.log(payload);
   
   const isUserExists = await prisma.user.findUnique({
     where: { email: payload.email },
@@ -53,8 +54,9 @@ const getRefreshToken = async (token: string) => {
   let decoded: JwtPayload;
   try {
     decoded = jwt.verify(token, config.refresh_secret_key as string) as JwtPayload;
-  } catch (error) {
-    throw new AppError(StatusCodes.UNAUTHORIZED, 'Invalid refresh token');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error:any) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, error.message||'Invalid refresh token');
   }
 
   const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
@@ -109,8 +111,9 @@ const resetPassword = async (payload: { email: string; newPassword: string }, to
   let decoded: JwtPayload;
   try {
     decoded = jwt.verify(token, config.access_secret_key as string) as JwtPayload;
-  } catch (error) {
-    throw new AppError(StatusCodes.FORBIDDEN, 'Invalid or expired token');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error:any) {
+    throw new AppError(StatusCodes.FORBIDDEN, error.message||'Invalid or expired token');
   }
 
   if (payload.email !== decoded.email) {
