@@ -30,7 +30,6 @@ const loginUser = async (payload: User) => {
     userId: isUserExists.id,
     role: isUserExists.role,
     email: isUserExists.email,
-    username: isUserExists.username,
   };
 
   

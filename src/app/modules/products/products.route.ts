@@ -11,5 +11,17 @@ router.post(
   '/category',
   ProductsControllers.createProductsCategory,
 );
+router.get(
+  '/',
+  ProductsControllers.getALlProducts,
+);
+router.post(
+  '/add-to-card/:userId/:productId',
+  ProductsControllers.addCard,
+);
+router.get(
+  '/my-card/:userId',
+  ProductsControllers.getMyCard,
+);
 
 export const productRoute = router
