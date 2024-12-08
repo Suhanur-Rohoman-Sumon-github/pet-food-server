@@ -1,14 +1,17 @@
-
-
 export interface IProductFilterRequest {
-  searchTerm?: string;
-  category?: string; // Example of additional filters
+  searchTerm?: string
+  category?: string 
 }
 
-// Assume IPaginationOptions is defined as:
+
 export interface IPaginationOptions {
-  page: number;
-  limit: number;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  page: number
+  limit: number
+  sortBy?: string
+  sortOrder?: 'asc' | 'desc'
+}
+
+export interface CardItem {
+  productId: string
+  quantity: number
 }

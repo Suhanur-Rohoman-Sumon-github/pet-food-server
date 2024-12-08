@@ -1,21 +1,19 @@
-import { ZodError, ZodIssue } from 'zod';
-import { TErrorSources } from '../interfece/error';
-
-
+import { ZodError, ZodIssue } from 'zod'
+import { TErrorSources } from '../interfece/error'
 
 const handleZodError = (err: ZodError) => {
-  const statusCode = 400;
+  const statusCode = 400
   const errorSources: TErrorSources = err.issues.map((issue: ZodIssue) => {
     return {
       path: issue?.path[issue?.path?.length - 1],
       message: issue.message,
-    };
-  });
+    }
+  })
   return {
     statusCode,
     message: ' validation error ',
     errorSources,
-  };
-};
+  }
+}
 
-export default handleZodError;
+export default handleZodError

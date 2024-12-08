@@ -1,6 +1,5 @@
-
-import nodemailer from 'nodemailer';
-import config from '../config';
+import nodemailer from 'nodemailer'
+import config from '../config'
 
 export const sendEmail = async (to: string, html: string) => {
   const transporter = nodemailer.createTransport({
@@ -12,7 +11,7 @@ export const sendEmail = async (to: string, html: string) => {
       user: 'sumonsuhanurrohoman@gmail.com',
       pass: 'yzsu mboq vnje wyal',
     },
-  });
+  })
 
   await transporter.sendMail({
     from: 'sumonsuhanurrohoman@gmail.com', // sender address
@@ -20,5 +19,5 @@ export const sendEmail = async (to: string, html: string) => {
     subject: 'Reset your password within ten mins!', // Subject line
     text: '', // plain text body
     html, // html body
-  });
-};
+  })
+}

@@ -1,3 +1,3 @@
-import { User_Role } from "./user.constant";
+import { User_Role } from './user.constant'
 
-export type TUserRol = keyof typeof User_Role;
+export type TUserRol = keyof typeof User_Role
