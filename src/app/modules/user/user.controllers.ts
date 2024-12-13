@@ -14,7 +14,20 @@ const createUser = catchAsync(async (req, res) => {
     data: result,
   })
 })
+const createAdmin = catchAsync(async (req, res) => {
+  
+
+  const result = await UserServices.createAdminInDB(req.body)
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'admin is created successfully',
+    data: result,
+  })
+})
 
 export const userControllers = {
   createUser,
+  createAdmin
 }

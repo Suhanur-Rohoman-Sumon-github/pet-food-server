@@ -1,8 +1,10 @@
 export interface IProductFilterRequest {
   searchTerm?: string
-  category?: string 
+  category?: string
+  minPrice?:string
+  maxPrice?:string
+  sort?:string
 }
-
 
 export interface IPaginationOptions {
   page: number

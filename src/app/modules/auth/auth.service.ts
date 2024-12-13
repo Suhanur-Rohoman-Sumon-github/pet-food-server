@@ -10,12 +10,9 @@ import AppError from '../../error/Apperror'
 const prisma = new PrismaClient()
 
 const loginUser = async (payload: User) => {
-  console.log(payload)
-
   const isUserExists = await prisma.user.findUnique({
     where: { email: payload.email },
   })
-  console.log(isUserExists)
 
   if (!isUserExists) {
     throw new AppError(StatusCodes.NOT_FOUND, 'User not found')
@@ -30,7 +27,7 @@ const loginUser = async (payload: User) => {
   }
 
   const jwtPayload = {
-    userId: isUserExists.id,
+    id: isUserExists.id,
     role: isUserExists.role,
     email: isUserExists.email,
   }

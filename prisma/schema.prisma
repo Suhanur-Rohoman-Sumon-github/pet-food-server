@@ -27,24 +27,27 @@ model User {
   status     Status?
   isDeleted  Boolean  @default(false)
   role       Role
-  card       Json? @default("[]")
+  card       Json?    @default("[]")
   wishList   String[]
-  compare String[]
+  compare    String[]
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+  admin      Admin?   @relation(fields: [adminId], references: [id]) 
+  adminId    String? @unique
 }
 
-
 model Admin {
-  id          String  @id @default(uuid())
+  id          String   @id @default(uuid())
   name        String
   location    String
-  email       String
+  email       String   @unique
   designation String
   contactNo   String
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+  user        User?    @relation 
 }
+
 
 model Vendor {
   id          String  @id @default(uuid())
@@ -96,6 +99,7 @@ model Product {
   created_at     DateTime @default(now())
   Shop           Shop?    @relation(fields: [shop_id], references: [id])
   Category       Category? @relation(fields: [category_id], references: [id])
+  reviews        Json? @default("[]")
 }
 
 

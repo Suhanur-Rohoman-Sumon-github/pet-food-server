@@ -5,6 +5,7 @@ import { productsService } from './products.services'
 import pick from '../../utils/pick'
 import { IPaginationOptions } from './product.interface'
 
+
 const createProducts = catchAsync(async (req, res) => {
   const result = await productsService.createProductsInDB(req.body)
 
@@ -33,9 +34,11 @@ const getALlProducts = catchAsync(async (req, res) => {
     sortOrder: (req.query.sortOrder as 'asc' | 'desc') || 'desc',
   }
 
-  const filters = pick(req.query, ['name', 'category', 'searchTerm'])
+  const filters = pick(req.query, ['name', 'category', 'searchTerm','sort'])
+  
+  
 
-  const result = await productsService.getALlProductsFromDB(filters, options)
+  const result = await productsService.getAllProductsFromDB(filters, options)
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
@@ -70,6 +73,54 @@ const getMyCard = catchAsync(async (req, res) => {
     data: result,
   })
 })
+const getSingleProducts = catchAsync(async (req, res) => {
+  const { productId } = req.params
+
+  const result = await productsService.getSingleProductsFromDb(productId)
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'single data retrieve successfully',
+    data: result,
+  })
+})
+const getRelatedProducts = catchAsync(async (req, res) => {
+  const { categoryId } = req.params
+
+  const result = await productsService.getRelatedProductsFromDb(categoryId)
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'related product retrieve successfully',
+    data: result,
+  })
+})
+const addProductInWishList = catchAsync(async (req, res) => {
+  const { productId,userId } = req.params
+
+  const result = await productsService.addWishlistInDB(userId,productId)
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'related product retrieve successfully',
+    data: result,
+  })
+})
+const myWishList = catchAsync(async (req, res) => {
+  
+  const {userId } = req.params
+  const result = await productsService.getMyWishListProducts(userId)
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'related product retrieve successfully',
+    data: result,
+  })
+})
 
 export const ProductsControllers = {
   createProducts,
@@ -77,4 +128,8 @@ export const ProductsControllers = {
   getALlProducts,
   addCard,
   getMyCard,
+  getSingleProducts,
+  getRelatedProducts,
+  addProductInWishList,
+  myWishList
 }

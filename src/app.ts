@@ -11,7 +11,15 @@ const app: Application = express()
 // parser
 app.use(express.json())
 
-app.use(cors())
+
+const corsOptions = {
+  origin: ['https://pethavens.vercel.app', 'http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
 
 // Application routers
 app.use('/api/v1', router)
