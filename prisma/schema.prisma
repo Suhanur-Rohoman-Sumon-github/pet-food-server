@@ -32,8 +32,7 @@ model User {
   compare    String[]
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  admin      Admin?   @relation(fields: [adminId], references: [id]) 
-  adminId    String? @unique
+ 
 }
 
 model Admin {
@@ -45,7 +44,7 @@ model Admin {
   contactNo   String
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
-  user        User?    @relation 
+ 
 }
 
 
