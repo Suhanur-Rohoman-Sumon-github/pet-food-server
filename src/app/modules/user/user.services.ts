@@ -13,9 +13,10 @@ const creteUserInDB = async (payload: User) => {
   return result
 }
 const createAdminInDB = async (payload:payload) => {
+  console.log(payload);
   const result = await prisma.$transaction(async (tx) => {
   
-    const user = await tx.user.create({
+     await tx.user.create({
       data: {
         email: payload.email,
         password: payload.password, 
@@ -38,7 +39,7 @@ const createAdminInDB = async (payload:payload) => {
           email: payload.email,
           designation: payload.designation,
           contactNo: payload.contactNo,
-           user: { connect: { id: user.id } }
+           
         },
       });
     }

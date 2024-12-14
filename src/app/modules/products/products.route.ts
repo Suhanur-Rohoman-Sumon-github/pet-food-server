@@ -1,9 +1,10 @@
 import express from 'express'
 import { ProductsControllers } from './products.controllers'
+import { multerUpload } from '../../config/multer.config'
 
 const router = express.Router()
 
-router.post('/', ProductsControllers.createProducts)
+router.post('/',multerUpload.array('images'), ProductsControllers.createProducts)
 router.get('/', ProductsControllers.getALlProducts)
 router.get('/:productId', ProductsControllers.getSingleProducts)
 

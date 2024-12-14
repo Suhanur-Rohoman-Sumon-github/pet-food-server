@@ -6,6 +6,7 @@ import { IPaginationOptions } from '../products/product.interface'
 import pick from '../../utils/pick'
 const createUser = catchAsync(async (req, res) => {
   const userData = req.body
+  console.log(userData);
 
   const result = await UserServices.creteUserInDB(userData)
 
@@ -48,7 +49,7 @@ const getAllUser = catchAsync(async (req, res) => {
     sortBy: req.query.sortBy as string,
     sortOrder: (req.query.sortOrder as 'asc' | 'desc') || 'desc',
   };
-  console.log(req.query);
+  
 
   // Filters for the query
   const filters = pick(req.query, ['role', 'status', 'searchTerm']);

@@ -7,10 +7,12 @@ import { StatusCodes } from 'http-status-codes'
 
 const prisma = new PrismaClient()
 
-const createProductsInDB = async (payload: Product) => {
+const createProductsInDB = async (payload: Partial<Product>,  imageUrls: Express.Multer.File[] | undefined,) => {
+  const images = imageUrls ? imageUrls.map(image => image.path) : []; 
+  const newData = { ...payload, images }; 
   const result = await prisma.product.create({
     // @ts-ignore
-    data: payload,
+    data: newData,
   })
 
   return result

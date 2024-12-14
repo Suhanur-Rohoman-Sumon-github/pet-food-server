@@ -44,7 +44,9 @@ model Admin {
   contactNo   String
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
- 
+   status     Status? @default(inProgress)
+  isDeleted  Boolean  @default(false)
+  needPasswordChange  Boolean  @default(false)
 }
 
 
@@ -58,6 +60,9 @@ model Vendor {
   shop        Shop?  
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+   status     Status? @default(inProgress)
+  isDeleted  Boolean  @default(false)
+  needPasswordChange  Boolean  @default(false)
 }
 
 model Shop {
@@ -95,7 +100,7 @@ model Product {
   stock_quantity Int      @default(0)
   discount_price Float?   @default(0.0)
   images         String[] @default([])
-  created_at     DateTime @default(now())
+  created_at     DateTime? @default(now())
   Shop           Shop?    @relation(fields: [shop_id], references: [id])
   Category       Category? @relation(fields: [category_id], references: [id])
   reviews        Json? @default("[]")

@@ -7,7 +7,19 @@ import { IPaginationOptions } from './product.interface'
 
 
 const createProducts = catchAsync(async (req, res) => {
-  const result = await productsService.createProductsInDB(req.body)
+  
+  const { name, description, price,  stock_quantity,shop_id,category_id } = JSON.parse(req.body.data);
+
+    let images: Express.Multer.File[] = [];
+
+  if (Array.isArray(req.files)) {
+    // If files are an array
+    images = req.files as Express.Multer.File[];
+  } else if (req.files && typeof req.files === 'object') {
+    // If files are in an object format, cast and concatenate all the arrays of files
+    images = Object.values(req.files).flat() as Express.Multer.File[];
+  }
+  const result = await productsService.createProductsInDB({ name, description, price,  stock_quantity,shop_id,category_id },images)
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
