@@ -7,7 +7,8 @@
     "start": "ts-node-dev --respawn --transpile-only ./src/server.ts",
     "dev": "tsc --watch",
     "lint": "eslint --ext .js,.ts .",
-    "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\""
+    "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
+    "build": "prisma generate && vercel --prod"
   },
   "keywords": [],
   "author": "",
@@ -45,6 +46,7 @@
     "multer": "^1.4.5-lts.1",
     "multer-storage-cloudinary": "^4.0.0",
     "nodemailer": "^6.9.16",
+    "stripe": "^17.4.0",
     "zod": "^3.23.8"
   }
 }

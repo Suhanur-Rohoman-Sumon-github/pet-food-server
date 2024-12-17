@@ -1,5 +1,3 @@
-// This is your Prisma schema file
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,6 +6,125 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  password   String
+  role       Role
+  created_at DateTime @default(now())
+  isDeleted  Boolean  @default(false)
+  status     Status?
+  updated_at DateTime @updatedAt
+  card       Json?    @default("[]")
+  wishList   String[]
+  compare    String[]
+
+  Order Order[]
+}
+
+model Admin {
+  id                 String   @id @default(uuid())
+  name               String
+  location           String
+  email              String   @unique
+  designation        String
+  contactNo          String
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+  isDeleted          Boolean  @default(false)
+  status             Status?  @default(inProgress)
+  needPasswordChange Boolean  @default(false)
+}
+
+model Vendor {
+  id                 String   @id @default(uuid())
+  name               String
+  location           String
+  email              String
+  designation        String
+  contactNo          String
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+  isDeleted          Boolean  @default(false)
+  status             Status?  @default(inProgress)
+  needPasswordChange Boolean  @default(false)
+  shop               Shop?
+}
+
+model Shop {
+  id              String    @id @default(uuid())
+  name            String
+  location        String?   @default("")
+  cover_photo     String?   @default("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReTLRC8Q2CHzfjB3HF-6QpGr5B9KGLxDancA&s")
+  profile_picture String?   @default("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmu97XQ8T7AglouJJvJnf_tDN5YzlwGuqwlA&s")
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  vendorId        String    @unique
+  ratings         Int       @default(0)
+  follower        Json?     @default("[]")
+  products        Product[]
+  vendor          Vendor    @relation(fields: [vendorId], references: [id])
+
+  Order Order[]
+}
+
+model Category {
+  id         String    @id @default(uuid())
+  name       String
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  products   Product[]
+}
+
+model Product {
+  id             String    @id @default(uuid())
+  name           String
+  price          Float     @default(0.0)
+  images         String[]  @default([])
+  description    String?   @default("")
+  category_id    String?
+  created_at     DateTime? @default(now())
+  discount_price Float?    @default(0.0)
+  shop_id        String?
+  stock_quantity Int       @default(0)
+  reviews        Json?     @default("[]")
+  Category       Category? @relation(fields: [category_id], references: [id])
+  Shop           Shop?     @relation(fields: [shop_id], references: [id])
+}
+
+model Order {
+  id               String       @id @default(uuid())
+  userId           String      
+  user             User         @relation(fields: [userId], references: [id])
+  shopId           String?     
+  shop             Shop?        @relation(fields: [shopId], references: [id])
+  products         Json         
+  totalAmount      Float        @default(0.0) 
+  paymentStatus    PaymentStatus @default(PENDING) 
+  orderStatus      OrderStatus   @default(PENDING) 
+  shippingAddress  String
+  contactNumber    String
+  created_at       DateTime     @default(now())
+  updated_at       DateTime     @updatedAt
+  isDeleted        Boolean      @default(false)
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  RETURNED
+}
+
 
 enum Role {
   ADMIN
@@ -19,91 +136,3 @@ enum Status {
   inProgress
   Blocked
 }
-
-model User {
-  id         String   @id @default(uuid())
-  email      String   @unique
-  password   String
-  status     Status?
-  isDeleted  Boolean  @default(false)
-  role       Role
-  card       Json?    @default("[]")
-  wishList   String[]
-  compare    String[]
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
- 
-}
-
-model Admin {
-  id          String   @id @default(uuid())
-  name        String
-  location    String
-  email       String   @unique
-  designation String
-  contactNo   String
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-   status     Status? @default(inProgress)
-  isDeleted  Boolean  @default(false)
-  needPasswordChange  Boolean  @default(false)
-}
-
-
-model Vendor {
-  id          String  @id @default(uuid())
-  name        String
-  location    String
-  email       String
-  designation String
-  contactNo   String
-  shop        Shop?  
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-   status     Status? @default(inProgress)
-  isDeleted  Boolean  @default(false)
-  needPasswordChange  Boolean  @default(false)
-}
-
-model Shop {
-  id              String   @id @default(uuid())
-  name            String
-  location        String?   @default("") 
-  cover_photo     String?   @default("") 
-  profile_picture String?   @default("") 
-  products        Product[]
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
-  vendorId        String   @unique
-  vendor          Vendor   @relation(fields: [vendorId], references: [id])
-  ratings         Int      @default(0) 
-  follower        Int      @default(0)
-
-}
-
-model Category {
-  id         String   @id @default(uuid())
-  name       String
-  products   Product[]
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-}
-
-
-model Product {
-  id             String   @id @default(uuid())
-  shop_id        String?  
-  category_id    String?  
-  name           String
-  price          Float    @default(0.0)
-  description    String?  @default("")
-  stock_quantity Int      @default(0)
-  discount_price Float?   @default(0.0)
-  images         String[] @default([])
-  created_at     DateTime? @default(now())
-  Shop           Shop?    @relation(fields: [shop_id], references: [id])
-  Category       Category? @relation(fields: [category_id], references: [id])
-  reviews        Json? @default("[]")
-}
-
-

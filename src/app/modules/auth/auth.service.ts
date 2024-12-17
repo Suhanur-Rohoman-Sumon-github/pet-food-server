@@ -22,8 +22,10 @@ const loginUser = async (payload: User) => {
     payload.password,
     isUserExists.password,
   )
+
   if (!isPasswordValid) {
-    throw new AppError(StatusCodes.FORBIDDEN, 'Wrong password')
+    
+    throw new Error('Wrong password')
   }
 
   const jwtPayload = {
@@ -43,6 +45,8 @@ const loginUser = async (payload: User) => {
     config.refresh_secret_key as string,
     config.JWT_REFRESH_EXPIRES_IN as string,
   )
+
+  
 
   return {
     accessToken,

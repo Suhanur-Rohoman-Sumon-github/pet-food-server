@@ -1,11 +1,10 @@
-import multer from 'multer';
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
-import { cloudinaryUpload } from './cludinary.config';
-
+import multer from 'multer'
+import { CloudinaryStorage } from 'multer-storage-cloudinary'
+import { cloudinaryUpload } from './cludinary.config'
 
 const removeExtension = (filename: string) => {
-  return filename.split('.').slice(0, -1).join('.');
-};
+  return filename.split('.').slice(0, -1).join('.')
+}
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinaryUpload,
@@ -19,5 +18,5 @@ const storage = new CloudinaryStorage({
       '-' +
       removeExtension(file.originalname),
   },
-});
-export const multerUpload = multer({ storage: storage });
+})
+export const multerUpload = multer({ storage: storage })

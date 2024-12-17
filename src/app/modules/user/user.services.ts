@@ -12,93 +12,85 @@ const creteUserInDB = async (payload: User) => {
 
   return result
 }
-const createAdminInDB = async (payload:payload) => {
-  console.log(payload);
-  const result = await prisma.$transaction(async (tx) => {
+const createAdminInDB = async (payload: payload) => {
   
-     await tx.user.create({
-      data: {
-        email: payload.email,
-        password: payload.password, 
-        role: payload.role as any, 
-        status: payload.status ? (payload.status as any) : undefined,
-        wishList: [], 
-        compare: [],
-      },
-    });
-
-   
-
-    
-    let admin = null;
-    if (payload.role === 'ADMIN') {
-      admin = await tx.admin.create({
-        data: {
-          name: payload.name,
-          location: payload.location,
-          email: payload.email,
-          designation: payload.designation,
-          contactNo: payload.contactNo,
-           
-        },
-      });
-    }
-
-    return   admin ;
-  });
-
-  return result;
-};
-const createVendorInDB = async (payload:payload) => {
-  const result = await prisma.$transaction(async (tx) => {
-  
+  const result = await prisma.$transaction(async tx => {
     const user = await tx.user.create({
       data: {
         email: payload.email,
-        password: payload.password, 
-        role: payload.role as any, 
+        password: payload.password,
+        role: payload.role as any,
         status: payload.status ? (payload.status as any) : undefined,
-        wishList: [], 
+        wishList: [],
         compare: [],
       },
-    });
+    })
 
-   
-
-    
-    let vendor = null;
-    if (payload.role === 'VENDOR') {
-      vendor = await tx.vendor.create({
+    let admin = null
+    if (payload.role === 'ADMIN') {
+      admin = await tx.admin.create({
         data: {
+          id: user.id,
           name: payload.name,
           location: payload.location,
           email: payload.email,
           designation: payload.designation,
           contactNo: payload.contactNo,
-           
         },
-      });
+      })
+    }
+    console.log(admin);
+    return admin
+  })
+
+  return result
+}
+const createVendorInDB = async (payload: payload) => {
+  const result = await prisma.$transaction(async tx => {
+    const user = await tx.user.create({
+      data: {
+        email: payload.email,
+        password: payload.password,
+        role: payload.role as any,
+        status: payload.status ? (payload.status as any) : undefined,
+        wishList: [],
+        compare: [],
+      },
+    })
+
+    let vendor = null
+    if (payload.role === 'VENDOR') {
+      vendor = await tx.vendor.create({
+        data: {
+          id: user.id,
+          name: payload.name,
+          location: payload.location,
+          email: payload.email,
+          designation: payload.designation,
+          contactNo: payload.contactNo,
+        },
+      })
     }
 
-    return {vendor,user} ;
-  });
+    return { vendor, user }
+  })
 
-  return result;
-};
+  return result
+}
 
 const getAllUserFromDB = async (filters: any, options: IPaginationOptions) => {
-  const { page, limit, sortBy, sortOrder } = options;
-  const skip = (page - 1) * limit;
+  const { page, limit, sortBy, sortOrder } = options
+  const skip = (page - 1) * limit
 
-  const where: any = {};
+  const where: any = {}
 
-  if (filters.role) where.role = filters.role;
-  if (filters.status) where.status = filters.status;
+  if (filters.role) where.role = filters.role
+  if (filters.status) where.status = filters.status
   if (filters.searchTerm) {
     where.OR = [
       { name: { contains: filters.searchTerm, mode: 'insensitive' } },
       { email: { contains: filters.searchTerm, mode: 'insensitive' } },
-    ];
+    ]
   }
 
   const users = await prisma.user.findMany({
@@ -106,9 +98,9 @@ const getAllUserFromDB = async (filters: any, options: IPaginationOptions) => {
     skip,
     take: limit,
     orderBy: sortBy ? { [sortBy]: sortOrder } : undefined,
-  });
+  })
 
-  const total = await prisma.user.count({ where });
+  const total = await prisma.user.count({ where })
 
   return {
     data: users,
@@ -118,14 +110,12 @@ const getAllUserFromDB = async (filters: any, options: IPaginationOptions) => {
       limit,
       totalPages: Math.ceil(total / limit),
     },
-  };
-};
-
-
+  }
+}
 
 export const UserServices = {
   creteUserInDB,
   createAdminInDB,
   createVendorInDB,
-  getAllUserFromDB
+  getAllUserFromDB,
 }

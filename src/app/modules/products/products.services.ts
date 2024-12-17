@@ -7,26 +7,30 @@ import { StatusCodes } from 'http-status-codes'
 
 const prisma = new PrismaClient()
 
-const createProductsInDB = async (payload: Partial<Product>,  imageUrls: Express.Multer.File[] | undefined,) => {
-  const images = imageUrls ? imageUrls.map(image => image.path) : []; 
-  const newData = { ...payload, images }; 
+const createProductsInDB = async (
+  payload: Partial<Product>,
+  imageUrls: Express.Multer.File[] | undefined,
+) => {
+  const images = imageUrls ? imageUrls.map(image => image.path) : []
+  const newData = { ...payload, images }
+
   const result = await prisma.product.create({
     // @ts-ignore
     data: newData,
   })
-
+  
   return result
 }
 const getAllProductsFromDB = async (
   params: IProductFilterRequest,
   options: IPaginationOptions,
 ) => {
-  const { page, limit } = options;
-  const skip = (page - 1) * limit;
+  const { page, limit } = options
+  const skip = (page - 1) * limit
 
-  const { searchTerm, category, sort, ...filterData } = params;
+  const { searchTerm, category, sort, ...filterData } = params
 
-  const andConditions: Prisma.ProductWhereInput[] = [];
+  const andConditions: Prisma.ProductWhereInput[] = []
 
   if (searchTerm) {
     andConditions.push({
@@ -34,59 +38,59 @@ const getAllProductsFromDB = async (
         { name: { contains: searchTerm, mode: 'insensitive' } },
         { description: { contains: searchTerm, mode: 'insensitive' } },
       ],
-    });
+    })
   }
 
-  let categoryId: string | undefined = undefined;
+  let categoryId: string | undefined = undefined
 
   if (category) {
     const categoryData = await prisma.category.findFirst({
       where: { name: category },
-    });
+    })
 
     if (!categoryData) {
-      throw new Error(`Category "${category}" not found`);
+      throw new Error(`Category "${category}" not found`)
     }
 
-    categoryId = categoryData.id;
+    categoryId = categoryData.id
   }
 
   if (categoryId) {
     andConditions.push({
       category_id: categoryId,
-    });
+    })
   }
 
   if (Object.keys(filterData).length > 0) {
-    const otherFilters = Object.keys(filterData).map((key) => ({
+    const otherFilters = Object.keys(filterData).map(key => ({
       [key]: {
         equals: (filterData as any)[key],
       },
-    }));
+    }))
 
     if (otherFilters.length > 0) {
       andConditions.push({
         AND: otherFilters,
-      });
+      })
     }
   }
 
   // Combine all conditions
   const whereConditions: Prisma.ProductWhereInput = {
     AND: andConditions,
-  };
+  }
 
   // Map sort options to Prisma's `orderBy`
-  let orderBy: any = { created_at: 'desc' };
+  let orderBy: any = { created_at: 'desc' }
 
   if (sort === 'high-to-low') {
-    orderBy = { price: 'desc' };
+    orderBy = { price: 'desc' }
   } else if (sort === 'low-to-high') {
-    orderBy = { price: 'asc' };
+    orderBy = { price: 'asc' }
   } else if (sort === 'rating-high-to-low') {
-    orderBy = { rating: 'desc' };
+    orderBy = { rating: 'desc' }
   } else if (sort === 'rating-low-to-high') {
-    orderBy = { rating: 'asc' };
+    orderBy = { rating: 'asc' }
   }
 
   // Fetch products
@@ -95,12 +99,12 @@ const getAllProductsFromDB = async (
     skip,
     take: limit,
     orderBy,
-  });
+  })
 
   // Count total products
   const total = await prisma.product.count({
     where: whereConditions,
-  });
+  })
 
   return {
     meta: {
@@ -110,10 +114,8 @@ const getAllProductsFromDB = async (
       totalPages: Math.ceil(total / limit),
     },
     data: products,
-  };
-};
-
-
+  }
+}
 
 const getSingleProductsFromDb = async (productsId: string) => {
   const result = await prisma.product.findUnique({
@@ -132,6 +134,11 @@ const createCategoryInDB = async (payload: Category) => {
     data: payload,
   })
   return result
+}
+const getALlCategoryFromDb = async () => {
+  const result = await prisma.category.findMany();
+return result
+ 
 }
 const addCardInDB = async (userId: string, productId: string) => {
   const product = await prisma.product.findUnique({
@@ -202,6 +209,7 @@ const getMyCardFromDb = async (userId: string) => {
       price: true,
       description: true,
       images: true,
+      shop_id:true
     },
   })
 
@@ -224,43 +232,71 @@ const getMyCardFromDb = async (userId: string) => {
   }
 }
 
-const removeCardItemInDB = async (userId: string, productId: string) => {
+const removeCardItemInDB = async (
+  userId: string,
+  productId: string | null,
+  replaceCartWithNewItem?: boolean,
+  newProductId?: string,
+  clearCartOnPurchase?: boolean
+) => {
   const user: any = await prisma.user.findUnique({
     where: { id: userId },
-  })
+  });
 
   if (!user) {
-    throw new AppError(StatusCodes.NOT_FOUND, 'User not found')
+    throw new AppError(StatusCodes.NOT_FOUND, 'User not found');
   }
 
+  // Clear the cart if the user has made a purchase
+  if (clearCartOnPurchase) {
+    const result = await prisma.user.update({
+    where: { id: userId },
+    data: { card: [] }, 
+  });
+
+    console.log("result from remove single product:",result);
+
+    return result;
+  }
+
+  // If replacing the cart with a new item
+  if (replaceCartWithNewItem) {
+    const updatedCard = [{ productId: newProductId }];
+    const result = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        card: updatedCard,
+      },
+    });
+console.log("result from remove replaceCartWithNewItem:",result);
+    return result;
+  }
+
+  // If not replacing, check if the item is in the cart
   if (
-    !user.card ||
-    !user.card.some(
-      (item: { productId: string }) => item.productId === productId,
-    )
+    productId &&
+    (!user.card || !user.card.some((item: { productId: string }) => item.productId === productId))
   ) {
-    throw new AppError(
-      StatusCodes.NOT_FOUND,
-      "Product not found in user's cart",
-    )
+    throw new AppError(StatusCodes.NOT_FOUND, "Product not found in user's cart");
   }
 
+  // Remove the product from the cart
   const updatedCard = user.card.filter(
     (item: { productId: string }) => item.productId !== productId,
-  )
+  );
 
- 
   const result = await prisma.user.update({
     where: { id: userId },
     data: {
       card: updatedCard,
     },
-  })
+  });
+ console.log("result from remove single product:",result);
+  return result;
+};
 
-  return result
-}
+
 const addWishlistInDB = async (userId: string, productId: string) => {
- 
   const user = await prisma.user.findUnique({
     where: { id: userId },
   })
@@ -269,14 +305,11 @@ const addWishlistInDB = async (userId: string, productId: string) => {
     throw new AppError(StatusCodes.NOT_FOUND, 'User not found')
   }
 
-
   if (user.wishList && user.wishList.includes(productId)) {
     throw new AppError(StatusCodes.BAD_REQUEST, 'Product already in wishlist')
   }
 
- 
   const updatedWishList = [...(user.wishList || []), productId]
-
 
   const result = await prisma.user.update({
     where: { id: userId },
@@ -296,15 +329,12 @@ const removeWishlistItemInDB = async (userId: string, productId: string) => {
     throw new AppError(StatusCodes.NOT_FOUND, 'User not found')
   }
 
- 
   if (!user.wishList || !user.wishList.includes(productId)) {
     throw new AppError(StatusCodes.NOT_FOUND, 'Product not found in wishlist')
   }
 
- 
   const updatedWishList = user.wishList.filter(item => item !== productId)
 
- 
   const result = await prisma.user.update({
     where: { id: userId },
     data: {
@@ -315,37 +345,29 @@ const removeWishlistItemInDB = async (userId: string, productId: string) => {
   return result
 }
 const getMyWishListProducts = async (userId: string) => {
- 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { wishList: true }, 
-  });
-
+    select: { wishList: true },
+  })
 
   if (!user) {
-    throw new AppError(StatusCodes.NOT_FOUND, 'User not found');
+    throw new AppError(StatusCodes.NOT_FOUND, 'User not found')
   }
-
 
   if (!user.wishList || user.wishList.length === 0) {
-    return []; 
+    return []
   }
 
-  
   const products = await prisma.product.findMany({
     where: {
-      id: { in: user.wishList }, 
+      id: { in: user.wishList },
     },
-  });
+  })
 
-  return products; 
-};
+  return products
+}
 
-
-
-const getRelatedProductsFromDb = async (
-  categoryId: string,
-) => {
+const getRelatedProductsFromDb = async (categoryId: string) => {
   if (!categoryId) {
     throw new AppError(StatusCodes.NOT_FOUND, 'category not found')
   }
@@ -369,5 +391,6 @@ export const productsService = {
   removeWishlistItemInDB,
   getSingleProductsFromDb,
   getRelatedProductsFromDb,
-  getMyWishListProducts
+  getMyWishListProducts,
+  getALlCategoryFromDb
 }

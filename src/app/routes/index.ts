@@ -4,6 +4,8 @@ import { authRouter } from '../modules/auth/auth.route'
 import { productRoute } from '../modules/products/products.route'
 import { vendorRoutes } from '../modules/vendor/vendor.route'
 import { shopeRoutes } from '../modules/shops/shops.route'
+import { PaymentsRoute } from '../modules/payment/payment.route'
+import { orderRoute } from '../modules/orders/order.route'
 
 const router = Router()
 
@@ -27,6 +29,14 @@ const moduleRoutes = [
   {
     path: '/shops',
     route: shopeRoutes,
+  },
+  {
+    path: '/payments',
+    route: PaymentsRoute,
+  },
+  {
+    path: '/orders',
+    route: orderRoute,
   },
 ]
 
