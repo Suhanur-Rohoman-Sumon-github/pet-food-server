@@ -4,11 +4,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node-dev --respawn --transpile-only ./src/server.ts",
+    "start": "NODE_ENV = production ts-node-dev --respawn --transpile-only ./src/server.ts",
     "dev": "tsc --watch",
     "lint": "eslint --ext .js,.ts .",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
-    "build": "prisma generate && vercel --prod",
+    "build": "npx prisma generate && vercel --prod",
     "postinstall": "npx prisma generate"
   },
   "keywords": [],

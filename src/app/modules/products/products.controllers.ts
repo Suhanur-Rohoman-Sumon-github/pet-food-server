@@ -100,6 +100,30 @@ const getMyCard = catchAsync(async (req, res) => {
     data: result,
   })
 })
+const addRecentVew = catchAsync(async (req, res) => {
+  const { userId,productId } = req.params
+
+  const result = await productsService.addRecentVewInDb(userId,productId)
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'my card data retrieve successfully',
+    data: result,
+  })
+})
+const getRecentVew = catchAsync(async (req, res) => {
+  const { userId } = req.params
+
+  const result = await productsService.getRecentProductFromDb(userId)
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'my card data retrieve successfully',
+    data: result,
+  })
+})
 const deleteCard = catchAsync(async (req, res) => {
   const { userId, productId } = req.params;
   const { replaceCartWithNewItem, newProductId, clearCartOnPurchase } = req.body;
@@ -119,7 +143,7 @@ const deleteCard = catchAsync(async (req, res) => {
     });
   }
 
-  // Replace the cart with a new item
+ 
   if (replaceCartWithNewItem && newProductId) {
     const result = await productsService.removeCardItemInDB(
       userId,
@@ -234,5 +258,7 @@ export const ProductsControllers = {
   getProductCategory,
   deleteCard,
   addReview,
-  deleteCategory
+  deleteCategory,
+  addRecentVew,
+  getRecentVew
 }

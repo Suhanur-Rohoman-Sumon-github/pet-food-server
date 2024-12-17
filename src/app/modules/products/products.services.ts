@@ -157,7 +157,7 @@ const deleteCategoryFromDb = async (categoryId: string) => {
 const getALlCategoryFromDb = async () => {
   const result = await prisma.category.findMany({
     where: {
-      isDeleted: false, 
+     isDeleted: false, 
     },
   });
   return result;
@@ -281,7 +281,7 @@ const removeCardItemInDB = async (
     return result;
   }
 
-  // If replacing the cart with a new item
+ 
   if (replaceCartWithNewItem) {
     const updatedCard = [{ productId: newProductId }];
     const result = await prisma.user.update({
@@ -294,7 +294,7 @@ const removeCardItemInDB = async (
     return result;
   }
 
-  // If not replacing, check if the item is in the cart
+ 
   if (
     productId &&
     (!user.card || !user.card.some((item: { productId: string }) => item.productId === productId))
@@ -302,7 +302,7 @@ const removeCardItemInDB = async (
     throw new AppError(StatusCodes.NOT_FOUND, "Product not found in user's cart");
   }
 
-  // Remove the product from the cart
+ 
   const updatedCard = user.card.filter(
     (item: { productId: string }) => item.productId !== productId,
   );
@@ -401,6 +401,75 @@ const getRelatedProductsFromDb = async (categoryId: string) => {
   })
   return relatedProducts
 }
+const addRecentVewInDb = async (productId: string,userId:string) => {
+ 
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  })
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+ 
+  const recentViews = user.recentlyViewed || [];
+
+  
+  if (!recentViews.includes(productId)) {
+    
+    recentViews.push(productId);
+
+    
+   const result = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        recentlyViewed: recentViews,
+      },
+    });
+  return result
+}}
+const getRecentProductFromDb = async (userId: string, ) => {
+  
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { recentlyViewed: true },
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  let recentViews = user.recentlyViewed || [];
+
+  
+
+  
+  if (recentViews.length > 8) {
+    recentViews = recentViews.slice(-8); 
+  }
+
+  
+  await prisma.user.update({
+    where: { id: userId },
+    data: { recentlyViewed: recentViews },
+  });
+
+
+  const recentProducts = await prisma.product.findMany({
+    where: {
+      id: { in: recentViews },
+    },
+  });
+
+  return recentProducts;
+};
+
+
 
 const addReviewInDb = async (productId: string, payload: { rating: number; comment: string; userId: string }) =>{
       const product = await prisma.product.findUnique({
@@ -436,5 +505,7 @@ export const productsService = {
   getMyWishListProducts,
   getALlCategoryFromDb,
   addReviewInDb,
-  deleteCategoryFromDb
+  deleteCategoryFromDb,
+  addRecentVewInDb,
+  getRecentProductFromDb
 }
