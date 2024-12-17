@@ -36,6 +36,28 @@ const createVendor = catchAsync(async (req, res) => {
     data: result,
   })
 })
+const makeUserBlock = catchAsync(async (req, res) => {
+  const {userId} = req.params
+  const result = await UserServices.blockUser(userId)
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'user is blocked successfully',
+    data: result,
+  })
+})
+const deleteUser = catchAsync(async (req, res) => {
+  const {userId} = req.params
+  const result = await UserServices.deleteUserFromDb(userId)
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'user is blocked successfully',
+    data: result,
+  })
+})
 const getAllUser = catchAsync(async (req, res) => {
   const options: IPaginationOptions = {
     page: parseInt(req.query.page as string) || 1,
@@ -44,13 +66,13 @@ const getAllUser = catchAsync(async (req, res) => {
     sortOrder: (req.query.sortOrder as 'asc' | 'desc') || 'desc',
   }
 
-  // Filters for the query
+
   const filters = pick(req.query, ['role', 'status', 'searchTerm'])
 
-  // Fetching filtered and paginated users
+ 
   const result = await UserServices.getAllUserFromDB(filters, options)
 
-  // Sending the response
+
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -65,4 +87,6 @@ export const userControllers = {
   createAdmin,
   createVendor,
   getAllUser,
+  makeUserBlock,
+  deleteUser
 }

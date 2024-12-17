@@ -78,6 +78,53 @@ const createVendorInDB = async (payload: payload) => {
   return result
 }
 
+const blockUser = async (userId:string) =>{
+ const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        status: "Blocked", 
+      },
+    });
+
+    return updatedUser;
+}
+const deleteUserFromDb = async (userId:string) =>{
+ const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        isDeleted: true, 
+      },
+    });
+
+    return updatedUser;
+}
+
 const getAllUserFromDB = async (filters: any, options: IPaginationOptions) => {
   const { page, limit, sortBy, sortOrder } = options
   const skip = (page - 1) * limit
@@ -118,4 +165,6 @@ export const UserServices = {
   createAdminInDB,
   createVendorInDB,
   getAllUserFromDB,
+  blockUser,
+  deleteUserFromDb
 }

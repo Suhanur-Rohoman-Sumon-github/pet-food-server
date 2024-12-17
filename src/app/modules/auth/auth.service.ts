@@ -18,6 +18,13 @@ const loginUser = async (payload: User) => {
     throw new AppError(StatusCodes.NOT_FOUND, 'User not found')
   }
 
+  if(isUserExists.status === "Blocked") {
+    throw new AppError(StatusCodes.FORBIDDEN,"you are blocked")
+  }
+  if(isUserExists.isDeleted) {
+    throw new AppError(StatusCodes.NOT_FOUND,"user not found")
+  }
+
   const isPasswordValid = await bcrypt.compare(
     payload.password,
     isUserExists.password,
