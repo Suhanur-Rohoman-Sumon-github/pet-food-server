@@ -11,11 +11,24 @@ const createOrder = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
-    message: 'user is created successfully',
+    message: 'order is created successfully',
+    data: result,
+  })
+})
+const getMyOrders = catchAsync(async (req, res) => {
+  const userId = req.params.id as string
+
+  const result = await orderServices.getMyOrdersFromDb(userId)
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'order is created successfully',
     data: result,
   })
 })
 
 export const orderControllers ={
-    createOrder
+    createOrder,
+    getMyOrders
 }

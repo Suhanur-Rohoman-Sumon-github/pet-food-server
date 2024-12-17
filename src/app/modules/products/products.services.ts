@@ -380,6 +380,26 @@ const getRelatedProductsFromDb = async (categoryId: string) => {
   return relatedProducts
 }
 
+const addReviewInDb = async (productId: string, payload: { rating: number; comment: string; userId: string }) =>{
+      const product = await prisma.product.findUnique({
+      where: { id: productId },
+    });
+
+    
+    if (!product) {
+      throw new Error('Product not found');
+    }
+
+    const result = await prisma.product.update({
+      where: { id: productId },
+      data: {
+        reviews: payload
+      },
+    });
+
+    return result
+}
+
 export const productsService = {
   createProductsInDB,
   createCategoryInDB,
@@ -392,5 +412,6 @@ export const productsService = {
   getSingleProductsFromDb,
   getRelatedProductsFromDb,
   getMyWishListProducts,
-  getALlCategoryFromDb
+  getALlCategoryFromDb,
+  addReviewInDb
 }

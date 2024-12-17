@@ -184,6 +184,18 @@ const addProductInWishList = catchAsync(async (req, res) => {
     data: result,
   })
 })
+const addReview = catchAsync(async (req, res) => {
+  const { productId } = req.params
+  const result = await productsService.getMyWishListProducts(productId)
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Review added successfully',
+    data: result,
+  })
+})
+
 const myWishList = catchAsync(async (req, res) => {
   const { userId } = req.params
   const result = await productsService.getMyWishListProducts(userId)
@@ -196,6 +208,8 @@ const myWishList = catchAsync(async (req, res) => {
   })
 })
 
+
+
 export const ProductsControllers = {
   createProducts,
   createProductsCategory,
@@ -207,5 +221,6 @@ export const ProductsControllers = {
   addProductInWishList,
   myWishList,
   getProductCategory,
-  deleteCard
+  deleteCard,
+  addReview,
 }

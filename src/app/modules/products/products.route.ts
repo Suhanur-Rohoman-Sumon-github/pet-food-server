@@ -29,4 +29,6 @@ router.post(
 )
 router.get('/my-wishList/:userId', ProductsControllers.myWishList)
 
+router.get('/add-review/:productId', ProductsControllers.myWishList)
+
 export const productRoute = router
