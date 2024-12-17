@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PrismaClient, Shop } from '@prisma/client'
 import { IPaginationOptions } from '../products/product.interface'
+import AppError from '../../error/Apperror'
 
 const prisma = new PrismaClient()
 
@@ -17,7 +18,14 @@ const createShopsInDB = async (payload: Shop) => {
 const getMyShopsFromDb = async (id: string) => {
   const result = await prisma.shop.findMany({
     where: { vendorId: id },
+    
   })
+
+    const blockedShop = result.find((shop) => shop.isDeleted === true);
+
+  if (blockedShop) {
+    throw new AppError(403,"Shop is blocked.");
+  }
 
   return result
 }
@@ -29,8 +37,19 @@ const getSingleShopFromDB = async (id: string) => {
 
   return result
 }
+const deleteShopFromDb = async (id: string) => {
+  const result = await prisma.shop.update({
+    where: { id: id },
+    data: {
+      isDeleted: true, 
+    },
+    
+  });
+
+  return result;
+};
 const addFollowerInMyShopInDb = async (shopId: string, userId: string) => {
-  // Step 1: Find the shop by ID
+ 
   const shop = await prisma.shop.findUnique({
     where: { id: shopId }
   });
@@ -39,18 +58,18 @@ const addFollowerInMyShopInDb = async (shopId: string, userId: string) => {
     throw new Error(`Shop with id ${shopId} not found`);
   }
 
-  // Step 2: Ensure `follower` is always an array
+  
   const currentFollowers = Array.isArray(shop.follower) ? shop.follower : [];
 
-  // Step 3: Check if the userId already exists in the followers array
+  
   if (currentFollowers.includes(userId)) {
     throw new Error(`User with id ${userId} is already following this shop.`);
   }
 
-  // Step 4: Append the new userId to the followers array
+ 
   const updatedFollowers = [...currentFollowers, userId];
 
-  // Step 5: Update the shop with the new followers array
+
   const result = await prisma.shop.update({
     where: { id: shopId },
     data: {
@@ -61,37 +80,36 @@ const addFollowerInMyShopInDb = async (shopId: string, userId: string) => {
   return result;
 };
 
-
-
-
-
 const getAllShopsFromDB = async (filters: any, options: IPaginationOptions) => {
   const { page, limit, sortBy, sortOrder } = options;
 
-   const validSortBy = sortBy || 'name';
+  const validSortBy = sortBy || 'name';
 
- 
-  const query = {
-    where: {
-      ...filters.searchTerm && {
-        name: {
-          contains: filters.searchTerm, 
-          mode: 'insensitive',  
-        },
-      },
-      ...filters.status && { status: filters.status },  
-    },
+  // Prepare the query with optional filters
+  const query: any = {
+    where: {},
     orderBy: {
-      [validSortBy]: sortOrder, 
+      [validSortBy]: sortOrder,
     },
-    skip: (page - 1) * limit, 
-    take: limit,  
+    skip: (page - 1) * limit,
+    take: limit,
+   
   };
 
-  
-  const data = await prisma.shop.findMany(query);
+  // Add filters if they exist
+  if (filters.searchTerm) {
+    query.where.name = {
+      contains: filters.searchTerm,
+      mode: 'insensitive',
+    };
+  }
 
-  // Get the total count for pagination metadata
+  if (filters.status) {
+    query.where.status = filters.status;
+  }
+
+  // Fetch the data
+  const data = await prisma.shop.findMany(query);
   const totalCount = await prisma.shop.count({
     where: query.where,
   });
@@ -107,10 +125,12 @@ const getAllShopsFromDB = async (filters: any, options: IPaginationOptions) => {
   };
 };
 
+
 export const ShopsServices = {
   createShopsInDB,
   getMyShopsFromDb,
   getAllShopsFromDB,
   getSingleShopFromDB,
-  addFollowerInMyShopInDb
+  addFollowerInMyShopInDb,
+  deleteShopFromDb
 }

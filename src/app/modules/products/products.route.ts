@@ -14,6 +14,7 @@ router.get('/:productId', ProductsControllers.getSingleProducts)
 
 router.post('/category', ProductsControllers.createProductsCategory)
 router.get('/categories/category', ProductsControllers.getProductCategory)
+router.delete('/categories/category/:categoryId', ProductsControllers.deleteCategory)
 router.get(
   '/related-products/:categoryId',
   ProductsControllers.getRelatedProducts,

@@ -50,29 +50,46 @@ const addFollowerInMyShop = catchAsync(async (req, res) => {
     data: result,
   })
 })
+const deleteShop = catchAsync(async (req, res) => {
+  const {shopId} = req.params 
+  
+
+  const result = await ShopsServices.deleteShopFromDb(shopId)
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'shop is retrieve successfully',
+    data: result,
+  })
+})
 const getAllShops = catchAsync(async (req, res) => {
   const options: IPaginationOptions = {
     page: parseInt(req.query.page as string) || 1,
     limit: parseInt(req.query.limit as string) || 10,
-    sortBy: req.query.sortBy as string || 'name', 
-    sortOrder: (req.query.sortOrder as 'asc' | 'desc') || 'asc',  
-  }
+    sortBy: req.query.sortBy as string || 'name',
+    sortOrder: (req.query.sortOrder as 'asc' | 'desc') || 'asc',
+  };
 
   
-  const filters = pick(req.query, ['status', 'searchTerm'])
-
- 
-  const result = await ShopsServices.getAllShopsFromDB(filters, options)
+  
 
   
+  const filters = pick(req.query, ['status', 'searchTerm']);
+  
+  
+  
+
+  const result = await ShopsServices.getAllShopsFromDB(filters, options);
+
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
     message: 'Shops retrieved successfully',
     data: result.data,
-    meta: result.meta,  
-  })
-})
+    meta: result.meta,
+  });
+});
+
 
 
 export const shopControllers = {
@@ -80,5 +97,6 @@ export const shopControllers = {
   getMyShops,
   getAllShops,
   getSingleShop,
-  addFollowerInMyShop
+  addFollowerInMyShop,
+  deleteShop
 }

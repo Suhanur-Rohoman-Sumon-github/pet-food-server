@@ -19,8 +19,6 @@ model User {
   card       Json?    @default("[]")
   wishList   String[]
   compare    String[]
-
-  Order Order[]
 }
 
 model Admin {
@@ -65,8 +63,6 @@ model Shop {
   follower        Json?     @default("[]")
   products        Product[]
   vendor          Vendor    @relation(fields: [vendorId], references: [id])
-
-  Order Order[]
 }
 
 model Category {
@@ -92,39 +88,6 @@ model Product {
   Category       Category? @relation(fields: [category_id], references: [id])
   Shop           Shop?     @relation(fields: [shop_id], references: [id])
 }
-
-model Order {
-  id               String       @id @default(uuid())
-  userId           String      
-  user             User         @relation(fields: [userId], references: [id])
-  shopId           String?     
-  shop             Shop?        @relation(fields: [shopId], references: [id])
-  products         Json         
-  totalAmount      Float        @default(0.0) 
-  paymentStatus    PaymentStatus @default(PENDING) 
-  orderStatus      OrderStatus   @default(PENDING) 
-  shippingAddress  String
-  contactNumber    String
-  created_at       DateTime     @default(now())
-  updated_at       DateTime     @updatedAt
-  isDeleted        Boolean      @default(false)
-}
-
-enum PaymentStatus {
-  PENDING
-  PAID
-  FAILED
-}
-
-enum OrderStatus {
-  PENDING
-  CONFIRMED
-  SHIPPED
-  DELIVERED
-  CANCELLED
-  RETURNED
-}
-
 
 enum Role {
   ADMIN

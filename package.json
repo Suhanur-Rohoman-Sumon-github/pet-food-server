@@ -8,7 +8,8 @@
     "dev": "tsc --watch",
     "lint": "eslint --ext .js,.ts .",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
-    "build": "prisma generate && vercel --prod"
+    "build": "prisma generate && vercel --prod",
+    "postinstall": "npx prisma generate"
   },
   "keywords": [],
   "author": "",

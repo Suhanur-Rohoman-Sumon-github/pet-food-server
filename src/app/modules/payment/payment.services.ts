@@ -18,7 +18,6 @@ const createPaymentIntentInDb = async (price: number) => {
     },
   });
 
-  console.log(paymentIntent.client_secret);
 
   return {
     clientSecret: paymentIntent.client_secret,

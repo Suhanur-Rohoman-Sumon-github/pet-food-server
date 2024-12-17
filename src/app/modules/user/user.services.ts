@@ -39,7 +39,6 @@ const createAdminInDB = async (payload: payload) => {
         },
       })
     }
-    console.log(admin);
     return admin
   })
 
@@ -129,7 +128,9 @@ const getAllUserFromDB = async (filters: any, options: IPaginationOptions) => {
   const { page, limit, sortBy, sortOrder } = options
   const skip = (page - 1) * limit
 
-  const where: any = {}
+  const where: any = {   isDeleted: false,}
+
+  
 
   if (filters.role) where.role = filters.role
   if (filters.status) where.status = filters.status

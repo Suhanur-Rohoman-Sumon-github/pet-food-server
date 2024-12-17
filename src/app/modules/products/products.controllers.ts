@@ -103,11 +103,11 @@ const getMyCard = catchAsync(async (req, res) => {
 const deleteCard = catchAsync(async (req, res) => {
   const { userId, productId } = req.params;
   const { replaceCartWithNewItem, newProductId, clearCartOnPurchase } = req.body;
-  console.log(clearCartOnPurchase,replaceCartWithNewItem);
+  
 
-  console.log(req.body);
+  
 
-  // Clear the entire cart if a purchase is made
+  
   if (clearCartOnPurchase) {
     const result = await productsService.removeCardItemInDB(userId, null, false, clearCartOnPurchase);
     
@@ -195,6 +195,17 @@ const addReview = catchAsync(async (req, res) => {
     data: result,
   })
 })
+const deleteCategory = catchAsync(async (req, res) => {
+  const { categoryId } = req.params
+  const result = await productsService.deleteCategoryFromDb(categoryId)
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Review added successfully',
+    data: result,
+  })
+})
 
 const myWishList = catchAsync(async (req, res) => {
   const { userId } = req.params
@@ -223,4 +234,5 @@ export const ProductsControllers = {
   getProductCategory,
   deleteCard,
   addReview,
+  deleteCategory
 }

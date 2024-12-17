@@ -7,7 +7,7 @@ import { paymentService } from "./payment.services";
 
 const createPaymentIntent = catchAsync(async (req, res) => {
   const  {price}  = req.body;
-  console.log(price);
+  
   
 
   const results = await paymentService.createPaymentIntentInDb(price);

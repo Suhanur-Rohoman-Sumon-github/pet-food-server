@@ -135,11 +135,33 @@ const createCategoryInDB = async (payload: Category) => {
   })
   return result
 }
-const getALlCategoryFromDb = async () => {
-  const result = await prisma.category.findMany();
-return result
+const deleteCategoryFromDb = async (categoryId: string) => {
  
+  const category = await prisma.category.findUnique({
+    where: { id: categoryId },
+  });
+
+  if (!category) {
+    throw new Error("Category not found");
+  }
+
+ 
+  const updatedCategory = await prisma.category.update({
+    where: { id: categoryId }, 
+    data: { isDeleted: false },    
+  });
+
+  return updatedCategory; 
 }
+
+const getALlCategoryFromDb = async () => {
+  const result = await prisma.category.findMany({
+    where: {
+      isDeleted: false, 
+    },
+  });
+  return result;
+};
 const addCardInDB = async (userId: string, productId: string) => {
   const product = await prisma.product.findUnique({
     where: { id: productId },
@@ -254,7 +276,7 @@ const removeCardItemInDB = async (
     data: { card: [] }, 
   });
 
-    console.log("result from remove single product:",result);
+    
 
     return result;
   }
@@ -268,7 +290,7 @@ const removeCardItemInDB = async (
         card: updatedCard,
       },
     });
-console.log("result from remove replaceCartWithNewItem:",result);
+
     return result;
   }
 
@@ -291,7 +313,7 @@ console.log("result from remove replaceCartWithNewItem:",result);
       card: updatedCard,
     },
   });
- console.log("result from remove single product:",result);
+ 
   return result;
 };
 
@@ -413,5 +435,6 @@ export const productsService = {
   getRelatedProductsFromDb,
   getMyWishListProducts,
   getALlCategoryFromDb,
-  addReviewInDb
+  addReviewInDb,
+  deleteCategoryFromDb
 }
