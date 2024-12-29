@@ -469,6 +469,43 @@ const getRecentProductFromDb = async (userId: string, ) => {
   return recentProducts;
 };
 
+const getMyFollowedShopProductsFromDb = async (userId: string) => {
+ 
+  const followedShops = await prisma.shop.findMany({
+    where: {
+      follower: {
+        array_contains: [userId], 
+      },
+    },
+    select: { id: true },
+  });
+
+  const shopIds = followedShops.map(shop => shop.id);
+
+ 
+  const products = await prisma.product.findMany({
+    where: {
+      shop_id: {
+        in: shopIds, 
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      price: true,
+      images: true,
+      shop_id: true,
+    },
+  });
+
+
+  const oneProductPerShop = shopIds.map(shopId => {
+    return products.find(product => product.shop_id === shopId); 
+  });
+
+  return oneProductPerShop.filter(Boolean); 
+};
+
 
 
 const addReviewInDb = async (productId: string, payload: { rating: number; comment: string; userId: string }) =>{
@@ -507,5 +544,6 @@ export const productsService = {
   addReviewInDb,
   deleteCategoryFromDb,
   addRecentVewInDb,
-  getRecentProductFromDb
+  getRecentProductFromDb,
+  getMyFollowedShopProductsFromDb
 }

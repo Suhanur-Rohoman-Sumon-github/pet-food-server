@@ -124,6 +124,20 @@ const getRecentVew = catchAsync(async (req, res) => {
     data: result,
   })
 })
+const getMyFollowedShopProducts = catchAsync(async (req, res) => {
+  const { userId } = req.params
+
+  console.log(userId);
+
+  const result = await productsService.getMyFollowedShopProductsFromDb(userId)
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'my followed shop products retrieve successfully',
+    data: result,
+  })
+})
 const deleteCard = catchAsync(async (req, res) => {
   const { userId, productId } = req.params;
   const { replaceCartWithNewItem, newProductId, clearCartOnPurchase } = req.body;
@@ -260,5 +274,6 @@ export const ProductsControllers = {
   addReview,
   deleteCategory,
   addRecentVew,
-  getRecentVew
+  getRecentVew,
+  getMyFollowedShopProducts
 }
